@@ -9,7 +9,7 @@ from langchain_community.document_loaders import (
     UnstructuredPDFLoader,
     TextLoader
 )
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from urllib.parse import urljoin, urlparse
@@ -20,8 +20,8 @@ load_dotenv()
 app = Flask(__name__)
 
 # 🔹 Paths
-DATA_DIR = "data"
-DB_DIR = "chroma_db"
+DATA_DIR = "/data/data"
+DB_DIR = "/data/chroma_db"
 
 # 🔹 Load API key
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -313,7 +313,7 @@ def ask_openrouter(prompt):
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost:5000",
+        # "HTTP-Referer": "http://localhost:5000",
         "X-Title": "PCTE Assistant",
     }
     data = {
@@ -484,7 +484,5 @@ def rebuild_db():
 # --------------------------------------------------------
 # Run
 # --------------------------------------------------------
-# Production configuration
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 7860))  # Changed to 7860 for Hugging Face
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(debug=True, host="0.0.0.0", port=5000)

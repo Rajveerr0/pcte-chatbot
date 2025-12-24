@@ -1,25 +1,25 @@
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+    gcc g++ \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
+# Upgrade pip first
+RUN pip install --upgrade pip setuptools wheel
+
+# Install Python deps
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir \
+    --extra-index-url https://download.pytorch.org/whl/cpu \
+    -r requirements.txt
 
-# Copy application code
+
+# Copy app
 COPY . .
 
-# Expose port (Hugging Face uses 7860)
 EXPOSE 7860
 
-# Set environment variable
-ENV PORT=7860
-
-# Start the application
-CMD gunicorn app:app --bind 0.0.0.0:7860 --workers 1 --timeout 120 --preload
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:7860", "--timeout", "120"]
